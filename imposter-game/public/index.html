@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IMPOSTER — Social Deduction Game</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Animated background -->
+  <div class="bg-grid"></div>
+  <div class="bg-glow"></div>
+  <div class="particles" id="particles"></div>
+
+  <!-- ══ SCREEN: ENTRY ══ -->
+  <div class="screen active" id="screen-entry">
+    <div class="entry-card">
+      <div class="logo-wrap">
+        <div class="logo-eye">
+          <div class="eye-iris"></div>
+          <div class="eye-pupil"></div>
+          <div class="eye-scan"></div>
+        </div>
+        <h1 class="logo-text">IMPOSTER</h1>
+        <p class="logo-sub">SOCIAL DEDUCTION · REAL-TIME · MULTIPLAYER</p>
+      </div>
+
+      <div class="entry-form">
+        <div class="field-group">
+          <label class="field-label">YOUR CALLSIGN</label>
+          <input type="text" id="input-name" class="field-input" placeholder="Enter nickname..." maxlength="16" autocomplete="off" />
+        </div>
+        <div class="field-group">
+          <label class="field-label">ROOM CODE <span class="field-hint">(leave blank to create new)</span></label>
+          <input type="text" id="input-room" class="field-input" placeholder="e.g. ALPHA-7" maxlength="12" autocomplete="off" />
+        </div>
+        <button class="btn-primary" id="btn-join">ENTER THE GAME</button>
+        <div class="share-link-wrap" id="share-wrap" style="display:none">
+          <span class="share-label">INVITE LINK</span>
+          <div class="share-link-row">
+            <input type="text" id="share-link" class="share-link-input" readonly />
+            <button class="btn-copy" id="btn-copy">COPY</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SCREEN: LOBBY ══ -->
+  <div class="screen" id="screen-lobby">
+    <div class="lobby-layout">
+      <div class="lobby-header">
+        <div class="room-badge">ROOM: <span id="room-code-display">—</span></div>
+        <h2 class="lobby-title">WAITING FOR AGENTS</h2>
+        <p class="lobby-sub">Minimum 3 players required</p>
+      </div>
+
+      <div class="players-grid" id="lobby-players"></div>
+
+      <div class="lobby-footer">
+        <div class="player-count-bar">
+          <span id="player-count">0</span> / 10 AGENTS
+        </div>
+        <button class="btn-primary" id="btn-start" disabled>START MISSION</button>
+        <p class="host-note" id="host-note">Waiting for host to start...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SCREEN: ROLE REVEAL ══ -->
+  <div class="screen" id="screen-role">
+    <div class="role-reveal-card" id="role-reveal-card">
+      <div class="role-icon" id="role-icon">?</div>
+      <h2 class="role-title" id="role-title">—</h2>
+      <div class="role-word-box" id="role-word-box">
+        <span class="role-word-label" id="role-word-label">YOUR WORD</span>
+        <span class="role-word" id="role-word">—</span>
+      </div>
+      <p class="role-desc" id="role-desc">—</p>
+      <button class="btn-primary" id="btn-ready">I'M READY</button>
+    </div>
+  </div>
+
+  <!-- ══ SCREEN: GAME ══ -->
+  <div class="screen" id="screen-game">
+    <div class="game-layout">
+
+      <!-- Left: Players sidebar -->
+      <aside class="players-sidebar">
+        <div class="sidebar-title">AGENTS</div>
+        <div class="player-list" id="game-player-list"></div>
+        <div class="sidebar-info">
+          <div class="round-badge">ROUND <span id="current-round">1</span></div>
+        </div>
+      </aside>
+
+      <!-- Center: Main area -->
+      <main class="game-main">
+        <!-- Turn indicator -->
+        <div class="turn-banner" id="turn-banner">
+          <div class="turn-indicator">
+            <span class="turn-label">ACTIVE AGENT</span>
+            <span class="turn-name" id="turn-name">—</span>
+          </div>
+          <div class="word-hint-pill">
+            <span class="hint-label">YOUR HINT</span>
+            <span class="hint-value" id="game-hint">—</span>
+          </div>
+        </div>
+
+        <!-- Clue feed -->
+        <div class="clue-feed" id="clue-feed">
+          <div class="feed-empty">Waiting for clues...</div>
+        </div>
+
+        <!-- Clue input -->
+        <div class="clue-input-zone" id="clue-input-zone" style="display:none">
+          <div class="clue-input-label">YOUR CLUE (one word)</div>
+          <div class="clue-input-row">
+            <input type="text" id="clue-input" class="clue-input" placeholder="One word..." maxlength="30" autocomplete="off" />
+            <button class="btn-submit-clue" id="btn-submit-clue">SEND</button>
+          </div>
+        </div>
+
+        <div class="waiting-turn" id="waiting-turn">
+          <div class="waiting-dots"><span></span><span></span><span></span></div>
+          <p>Waiting for other agents...</p>
+        </div>
+      </main>
+
+      <!-- Right: AI chat -->
+      <aside class="ai-sidebar">
+        <div class="ai-header">
+          <div class="ai-avatar">N</div>
+          <div>
+            <div class="ai-name">NEXUS</div>
+            <div class="ai-role">AI MODERATOR</div>
+          </div>
+        </div>
+        <div class="ai-messages" id="ai-messages"></div>
+      </aside>
+    </div>
+  </div>
+
+  <!-- ══ SCREEN: VOTING ══ -->
+  <div class="screen" id="screen-voting">
+    <div class="voting-layout">
+      <div class="voting-header">
+        <div class="voting-title">🗳 VOTE FOR THE IMPOSTER</div>
+        <div class="vote-progress" id="vote-progress">0 / 0 voted</div>
+      </div>
+      <div class="voting-grid" id="voting-grid"></div>
+      <div class="voted-confirm" id="voted-confirm" style="display:none">
+        <span class="voted-check">✓</span> Vote submitted. Waiting for others...
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SCREEN: GAME OVER ══ -->
+  <div class="screen" id="screen-gameover">
+    <div class="gameover-card">
+      <div class="result-icon" id="result-icon">🏆</div>
+      <h2 class="result-title" id="result-title">CREWMATES WIN</h2>
+      <p class="result-reason" id="result-reason">—</p>
+      <div class="reveal-box">
+        <span class="reveal-label">THE IMPOSTER WAS</span>
+        <span class="reveal-name" id="imposter-reveal">—</span>
+        <span class="reveal-word">Secret word: <strong id="word-reveal">—</strong></span>
+      </div>
+      <button class="btn-primary" id="btn-play-again">PLAY AGAIN</button>
+    </div>
+  </div>
+
+  <!-- Error toast -->
+  <div class="toast" id="toast"></div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/socket.js"></script>
+  <script src="js/lobby.js"></script>
+  <script src="js/game.js"></script>
+  <script src="js/voting.js"></script>
+  <script src="js/chat.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>

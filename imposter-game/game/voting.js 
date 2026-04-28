@@ -1,0 +1,32 @@
+// voting.js - Vote tallying logic
+function tallyVotes(votes, players) {
+  const counts = {};
+  for (const voterId in votes) {
+    const target = votes[voterId];
+    if (target) counts[target] = (counts[target] || 0) + 1;
+  }
+
+  let maxVotes = 0;
+  let eliminated = null;
+  let tie = false;
+
+  for (const playerId in counts) {
+    if (counts[playerId] > maxVotes) {
+      maxVotes = counts[playerId];
+      eliminated = playerId;
+      tie = false;
+    } else if (counts[playerId] === maxVotes) {
+      tie = true;
+    }
+  }
+
+  if (tie) {
+    // Random tiebreak among tied players
+    const tied = Object.keys(counts).filter(id => counts[id] === maxVotes);
+    eliminated = tied[Math.floor(Math.random() * tied.length)];
+  }
+
+  return { eliminated, counts, tie };
+}
+
+module.exports = { tallyVotes };

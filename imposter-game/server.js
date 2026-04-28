@@ -8,7 +8,7 @@ const path = require('path');
 
 const { createRoom, getRoom, deleteRoom, addPlayer, removePlayer, getPublicState } = require('./game/rooms');
 const { assignRoles } = require('./game/roles');
-const { getRandomWord } = require('./game/words');
+const { getRandomWord } = require("./game/words");
 const { getNextTurn, getFirstTurn } = require('./game/turns');
 const { tallyVotes } = require('./game/voting');
 const { checkWin } = require('./game/win');
